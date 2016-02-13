@@ -17,10 +17,11 @@ Adafruit_ST7735 tft = Adafruit_ST7735(cs, dc, mosi, sclk, rst);
 #define RST_PIN 9
 MFRC522 mfrc522(SS_PIN, RST_PIN);
 
-boolean ted = false;
-boolean nate = false;
-boolean game = false;
 float p = 3.1415926;
+unsigned long swipedTime;
+int tag1 = 0;
+int tag2 = 0;
+int swipeTimeOut = 10000; //how much time between both cards
 
 void setup(void) {
   Serial.begin(9600);
@@ -79,6 +80,14 @@ void loop() {
             tft.println("to the game.");
             delay(2000);
             tft.fillScreen(ST7735_BLACK);
+
+             
+            if (tag2 == 1 && millis() - swipedTime < swipeTimeOut ){
+                   Serial.println("Game started");
+            }
+
+            tag1 = 1;
+            swipedTime = millis();
       }
   
       if (mfrc522.uid.uidByte[0] == 0x03 && 
@@ -100,9 +109,17 @@ void loop() {
             tft.println("to the game.");
             delay(2000);
             tft.fillScreen(ST7735_BLACK);
+
+            if (tag1 == 1 && millis() - swipedTime < swipeTimeOut ){
+                   Serial.println("Game started 2");
+                   delay(500);
+                   
+            }
+            tag2 = 1;
+            swipedTime = millis(); 
   
       }
-      
+
 }
 
 
